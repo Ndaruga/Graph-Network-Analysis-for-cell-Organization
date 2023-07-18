@@ -11,6 +11,10 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+data/
+data*
+Annotations_Cells_Cervelletto/
+gna/
 downloads/
 eggs/
 .eggs/
@@ -75,8 +79,6 @@ docs/_build/
 .pybuilder/
 target/
 
-# Jupyter Notebook
-.ipynb_checkpoints
 
 # IPython
 profile_default/
