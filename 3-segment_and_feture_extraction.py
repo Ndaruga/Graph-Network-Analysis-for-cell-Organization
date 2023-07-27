@@ -88,11 +88,11 @@ intensity_columns = ['mean_intensity', 'std_intensity']
 
 print('\n\n'+'*'*30 + " FEATURES DATAFRAME " + '*'*30)
 features_df = pd.DataFrame(features_list, columns=feature_columns + lbp_columns + intensity_columns + ['label'])
-print(features_df.head())
+print(features_df.tail(15))
 print("\nshape: ", features_df.shape)
+features_df.to_csv('extracted_features.csv')
 
-
-print('\n\n'+'*'*20 + "STANDARDIZED DATAFRAME" + '*'*20)
+# print('\n\n'+'*'*20 + "STANDARDIZED DATAFRAME" + '*'*20)
 
 # Standardize the features
 # scaler = StandardScaler()
