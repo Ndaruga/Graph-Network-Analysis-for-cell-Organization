@@ -15,7 +15,7 @@ def check_dir(dir_name):
         dir_name: The name of the directory to check.
 
     Returns:
-        True if the directory exists, False otherwise.
+        The directory name
     """
 
     if not os.path.exists(dir_name):
