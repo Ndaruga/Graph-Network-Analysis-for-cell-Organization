@@ -12,6 +12,7 @@ warnings.filterwarnings('ignore')
 
 
 df = pd.read_csv('filenames.csv')
+# print(df.head)
 ROOT_DIR = os.path.join('data', 'sliced_images')
 features_list = []
 
@@ -29,27 +30,24 @@ def extract_features(component):
 
     if len(component.shape) == 3: # Convert the component to grayscale if needed
         component = color.rgb2gray(component)
-    
+
     # Check if any regions were detected
     labeled_components = measure.label(component.astype(int))
     if labeled_components.max() == 0:
-        num_features = 12  # 4 shape features, 8 LBP features, mean_intensity, std_intensity
+        num_features = 14  # 4 shape features, 8 LBP features, mean_intensity, std_intensity
         return [0.0] * num_features
 
-
-
     # Shape Features
-    props = regionprops(component.astype(int))[0]
+    props = regionprops(labeled_components)[0]
     area = props.area
     perimeter = props.perimeter
     eccentricity = props.eccentricity
     solidity = props.solidity
 
-    # Texture Features - Using Local Binary Patterns (LBP)
+    # Texture Features - Using Local Binary Patterns (LBP) as an example
     lbp = feature.local_binary_pattern(component, P=8, R=1, method='uniform')
     hist_lbp, _ = np.histogram(lbp.ravel(), bins=np.arange(0, 9), range=(0, 9))
     lbp_features = hist_lbp.astype(float)
-    # print(lbp_features)
 
     # Intensity Features
     mean_intensity = component.mean()
@@ -59,7 +57,6 @@ def extract_features(component):
     features = [area, perimeter, eccentricity, solidity]
     features.extend(lbp_features)
     features.extend([mean_intensity, std_intensity])
-    print(features)
 
     return features
 
@@ -69,39 +66,36 @@ for index, row in df.iterrows():
     mask_filename = row['masks']
     label = row['labels']
 
-    # Read image and mask using OpenCV
-    image = cv2.imread(os.path.join(ROOT_DIR, image_filename))
-    mask = cv2.imread(os.path.join(ROOT_DIR, mask_filename), cv2.IMREAD_GRAYSCALE)
+    # Read image and mask using skit
+    image = io.imread(os.path.join(ROOT_DIR, image_filename))
+    mask = io.imread(os.path.join(ROOT_DIR, mask_filename))
 
     # Apply the mask to the image to extract the region of interest
     segmented_component = cv2.bitwise_and(image, image, mask=mask)
-    # print(segmented_component)
     features = extract_features(segmented_component)
-    features.append(row['labels'])
-    # print(features)
 
+    if 'labels' in df.columns:
+        features.append(row['labels'])
+
+    features_list.append(features)
 
 #---------------------GET PANDAS DATAFRAME-------------------------#
+
+# Convert the features_list to a pandas DataFrame
 feature_columns = ['area', 'perimeter', 'eccentricity', 'solidity']
-lbp_cols = [f'lbp_{i}' for i in range(8)]
-intensity_cols = ['mean_intensity', 'std_intesity']
-cols = feature_columns + lbp_cols + intensity_cols + ['label']
+lbp_columns = [f'lbp_{i}' for i in range(8)]  # LBP features
+intensity_columns = ['mean_intensity', 'std_intensity']
 
-# print('\n\n'+'*'*20 + " FEATURE DATAFRAME " + '*'*20)
-# print(pd.DataFrame(features, columns=cols))
+print('\n\n'+'*'*30 + " FEATURES DATAFRAME " + '*'*30)
+features_df = pd.DataFrame(features_list, columns=feature_columns + lbp_columns + intensity_columns + ['label'])
+print(features_df.head())
+print("\nshape: ", features_df.shape)
 
-# print(features_df.head())
 
-# standardize the features
+print('\n\n'+'*'*20 + "STANDARDIZED DATAFRAME" + '*'*20)
+
+# Standardize the features
 # scaler = StandardScaler()
-# scaled_features = scaler.fit_transform(features_df.drop(columns=['labels']))
+# scaled_features = scaler.fit_transform(features_df.drop(columns=['label']))
 # features_df[feature_columns + lbp_columns + intensity_columns] = scaled_features
-
-# print('\n\n'+'*'*20 + "STANDARDIZED DATAFRAME" + '*'*20)
-# print(feature_df.head())
-
-
-# Optionally, visualize the segmented component
-# cv2.imshow('Segmented Component', segmented_component)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+# print(features_df)
