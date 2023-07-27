@@ -32,8 +32,7 @@ def get_image_filenames():
         "masks": mask_filenames,
         "labels": label_filenames,
     })
-    # print(df)
+    df.to_csv('filenames.csv', index=True, header=True)
     return df
 
-exit()
-
+get_image_filenames()
