@@ -14,7 +14,7 @@ dist/
 data/
 data*
 Annotations_Cells_Cervelletto/
-gna/
+network_analysis.ipynb
 downloads/
 eggs/
 .eggs/
