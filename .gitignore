@@ -13,6 +13,7 @@ develop-eggs/
 dist/
 data/
 data*
+network/
 Annotations_Cells_Cervelletto/
 network_analysis.ipynb
 downloads/
