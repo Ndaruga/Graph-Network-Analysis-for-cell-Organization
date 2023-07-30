@@ -14,6 +14,7 @@ dist/
 data/
 data*
 network/
+test_image/
 Annotations_Cells_Cervelletto/
 network_analysis.ipynb
 downloads/
